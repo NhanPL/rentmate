@@ -25,6 +25,8 @@ rentmate/
 ├── backend/      # Backend (sẽ phát triển sau)
 ```
 
+---
+
 ## ✅ Các chức năng (đang phát triển)
 
 Trang đăng nhập (Login page)
@@ -37,8 +39,12 @@ Quản lý hợp đồng & hóa đơn
 
 Thanh toán & báo cáo
 
+---
+
 ## 🧑‍💻 Dev by
 
 👨‍💻 Đào Văn Nhân — Fullstack Developer
+
 💼 LinkedIn/GitHub: [https://github.com/NhanPL]
+
 📧 Email: [dvnhan1999@gmail.com]
