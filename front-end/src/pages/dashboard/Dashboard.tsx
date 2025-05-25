@@ -1,11 +1,33 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import CardOverview from '../../components/cardOverview/CardOverview';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import HouseIcon from '@mui/icons-material/House';
 import HouseSidingIcon from '@mui/icons-material/HouseSiding';
 import GroupsIcon from '@mui/icons-material/Groups';
 import TableCommon from '../../components/tableCommon/TableCommon';
+import ChartWrapper from '../../components/chartWrapper/ChartWrapper';
+
 const Dashboard = () => {
+  const sampleData = {
+    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+    datasets: [
+      {
+        label: 'Doanh thu',
+        data: [100, 200, 150, 250, 300, 400],
+        backgroundColor: '#3b82f6',
+      },
+    ],
+  };
+
+  const sampleOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+    },
+  };
   return (
     <Box component="div" sx={{ padding: 2, backgroundColor: '#FAFBFD' }}>
       <Box className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -38,8 +60,13 @@ const Dashboard = () => {
         <Box className="flex-1 bg-white p-2 rounded shadow">
           <TableCommon name="Recent Properties" headName={['Property Name', 'Location']} />
         </Box>
-        <Box className="flex-1 bg-white p-2 rounded shadow">
-          <TableCommon name="Recent Properties" headName={['Property Name', 'Location']} />
+        <Box className="flex-1 bg-white p-2 rounded shadow flex flex-col overflow-hidden">
+          <Typography variant="h6" fontWeight={'bold'} sx={{ padding: 2 }}>
+            Revenue Chart
+          </Typography>
+          <Box sx={{ padding: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+            <ChartWrapper data={sampleData} options={sampleOptions} type="bar" />
+          </Box>
         </Box>
       </Box>
     </Box>
