@@ -28,6 +28,7 @@ const AppRouter: React.FC = () => {
               </AdminLayout>
             </CommonLayout>
           }
+          handle={{ title: 'Quản lý phòng' }}
         />
         <Route
           path="/properties"

@@ -1,6 +1,24 @@
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#0D1836',
+      contrastText: '#fff',
+    },
+    secondary: {
+      main: '#D7F1FF',
+      contrastText: '#000',
+    },
+    background: {
+      default: '#FAFBFD',
+      paper: '#fff',
+    },
+    text: {
+      primary: '#000',
+      secondary: '#555',
+    },
+  },
   components: {
     MuiListItem: {
       styleOverrides: {

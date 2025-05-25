@@ -1,8 +1,7 @@
 import { Box, Paper } from '@mui/material';
+import { ReactNode } from 'react';
 import Header from '../../components/header/Header';
 import SideBar from '../../components/sideBar/SideBar';
-import Footer from '../../components/footer/Footer';
-import { ReactNode } from 'react';
 
 const AdminLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
@@ -19,19 +18,18 @@ const AdminLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
         sx={{
           flexGrow: 1,
           bgcolor: 'background.default',
-          p: 3,
           width: { sm: `calc(100% - 240px)` },
         }}
       >
         <Header />
         <Box
           sx={{
-            height: 'calc(100% - 64px - 64px)',
+            height: 'calc(100% - 64px)',
+            overflow: 'auto',
           }}
         >
           {children}
         </Box>
-        <Footer />
       </Box>
     </Paper>
   );

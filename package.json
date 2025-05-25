@@ -3,16 +3,16 @@
   "private": true,
   "version": "1.0.0",
   "workspaces": [
-    "frontend",
-    "backend"
+    "front-end",
+    "back-end"
   ],
   "scripts": {
-    "dev:frontend": "pnpm --filter frontend dev",
-    "dev:backend": "pnpm --filter backend dev",
-    "dev": "concurrently \"pnpm dev:frontend\" \"pnpm dev:backend\"",
-    "build:frontend": "pnpm --filter frontend build",
-    "build:backend": "pnpm --filter backend build",
-    "build": "pnpm build:frontend && pnpm build:backend"
+    "dev:frontend": "pnpm --filter front-end dev",
+    "dev:backend": "pnpm --filter back-end dev",
+    "dev": "concurrently \"pnpm dev:front-end\" \"pnpm dev:back-end\"",
+    "build:frontend": "pnpm --filter front-end build",
+    "build:backend": "pnpm --filter back-end build",
+    "build": "pnpm build:front-end && pnpm build:back-end"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
