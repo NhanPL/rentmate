@@ -28,6 +28,15 @@ const Dashboard = () => {
       },
     },
   };
+
+  const renderHeaderTable = () => {
+    return (
+      <Typography variant="h6" component="div" fontWeight={'bold'} sx={{ padding: 2 }}>
+        Recent Properties
+      </Typography>
+    );
+  };
+
   return (
     <Box component="div" sx={{ padding: 2, backgroundColor: '#FAFBFD' }}>
       <Box className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -57,8 +66,8 @@ const Dashboard = () => {
         />
       </Box>
       <Box className="grid grid-cols-1 lg:grid-cols-2 gap-4" sx={{ marginTop: 2 }}>
-        <Box className="flex-1 bg-white p-2 rounded shadow">
-          <TableCommon name="Recent Properties" headName={['Property Name', 'Location']} />
+        <Box className="flex-1 bg-white rounded shadow">
+          <TableCommon header={renderHeaderTable()} headName={['Property Name', 'Location']} />
         </Box>
         <Box className="flex-1 bg-white p-2 rounded shadow flex flex-col overflow-hidden">
           <Typography variant="h6" fontWeight={'bold'} sx={{ padding: 2 }}>
