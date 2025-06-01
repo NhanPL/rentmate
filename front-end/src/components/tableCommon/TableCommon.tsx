@@ -1,7 +1,8 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import React from 'react';
 
 type TableCommonProps = {
-  name: string;
+  header: React.ReactNode;
   // data: string[];
   headName: string[];
 };
@@ -14,12 +15,20 @@ const rows = [
   { name: 'Gingerbread', location: 356 },
 ];
 
-const TableCommon: React.FC<TableCommonProps> = ({ name, headName }) => {
+const TableCommon: React.FC<TableCommonProps> = ({ header, headName }) => {
   return (
-    <TableContainer component={'div'}>
-      <Typography variant="h6" component="div" fontWeight={'bold'} sx={{ padding: 2 }}>
-        {name}
-      </Typography>
+    <TableContainer
+      component={'div'}
+      sx={{
+        backgroundColor: 'white',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: 2,
+        borderRadius: 1,
+        boxShadow: 1,
+      }}
+    >
+      {header}
       <Table sx={{ minWidth: 250 }} aria-label="simple table">
         <TableHead>
           <TableRow>
