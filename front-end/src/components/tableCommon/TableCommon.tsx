@@ -3,19 +3,11 @@ import React from 'react';
 
 type TableCommonProps = {
   header: React.ReactNode;
-  // data: string[];
+  data: object[];
   headName: string[];
 };
 
-const rows = [
-  { name: 'Frozen yoghurt', location: 159 },
-  { name: 'Ice cream sandwich', location: 237 },
-  { name: 'Eclair', location: 262 },
-  { name: 'Cupcake', location: 305 },
-  { name: 'Gingerbread', location: 356 },
-];
-
-const TableCommon: React.FC<TableCommonProps> = ({ header, headName }) => {
+const TableCommon: React.FC<TableCommonProps> = ({ header, headName, data }) => {
   return (
     <TableContainer
       component={'div'}
@@ -38,12 +30,11 @@ const TableCommon: React.FC<TableCommonProps> = ({ header, headName }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell>{row.location}</TableCell>
+          {data.map((row, index) => (
+            <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              {Object.entries(row).map(([key, value]) => (
+                <TableCell key={key}>{value}</TableCell>
+              ))}
             </TableRow>
           ))}
         </TableBody>
