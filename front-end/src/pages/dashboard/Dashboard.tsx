@@ -19,6 +19,14 @@ const Dashboard = () => {
     ],
   };
 
+  const rows = [
+    { name: 'Frozen yoghurt', location: 159 },
+    { name: 'Ice cream sandwich', location: 237 },
+    { name: 'Eclair', location: 262 },
+    { name: 'Cupcake', location: 305 },
+    { name: 'Gingerbread', location: 356 },
+  ];
+
   const sampleOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -67,7 +75,7 @@ const Dashboard = () => {
       </Box>
       <Box className="grid grid-cols-1 lg:grid-cols-2 gap-4" sx={{ marginTop: 2 }}>
         <Box className="flex-1 bg-white rounded shadow">
-          <TableCommon header={renderHeaderTable()} headName={['Property Name', 'Location']} />
+          <TableCommon header={renderHeaderTable()} headName={['Property Name', 'Location']} data={rows} />
         </Box>
         <Box className="flex-1 bg-white p-2 rounded shadow flex flex-col overflow-hidden">
           <Typography variant="h6" fontWeight={'bold'} sx={{ padding: 2 }}>
