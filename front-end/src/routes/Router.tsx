@@ -7,6 +7,7 @@ import CommonLayout from '../layouts/commonLayout/CommonLayout';
 import Dashboard from '../pages/dashboard/Dashboard';
 import AdminLayout from '../layouts/adminLayout/AdminLayout';
 import Properties from '../pages/properties/Properties';
+import PropertiesDetail from '../pages/properties/Detail';
 
 const AppRouter: React.FC = () => {
   return (
@@ -37,6 +38,16 @@ const AppRouter: React.FC = () => {
             <CommonLayout>
               <AdminLayout>
                 <Properties />
+              </AdminLayout>
+            </CommonLayout>
+          }
+        />
+        <Route
+          path="/properties/:id"
+          element={
+            <CommonLayout>
+              <AdminLayout>
+                <PropertiesDetail />
               </AdminLayout>
             </CommonLayout>
           }
