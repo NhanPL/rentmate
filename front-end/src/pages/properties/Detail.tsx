@@ -1,15 +1,22 @@
+import { MoreVert } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import { Box, Button, Chip, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Chip, Typography } from '@mui/material';
+import { DeleteIcon } from 'lucide-react';
 import { useState } from 'react';
+import FormProperties from '../../components/form/formProperties/FormProperties';
 import PositionedMenu, { SharedMenuItem } from '../../components/positionedMenu/PositionedMenu';
 import TableCommon from '../../components/tableCommon/TableCommon';
-import data from './dataListRoom.json';
-import { DeleteIcon } from 'lucide-react';
 import { formatNumberIntl } from '../../utils/format';
+import data from './dataListRoom.json';
 
 const PropertiesDetail = () => {
+  const [openFormProperties, setOpenFormProperties] = useState(false);
+  const handleToggleFormProperties = () => {
+    setOpenFormProperties(!openFormProperties);
+  };
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -34,17 +41,6 @@ const PropertiesDetail = () => {
     setAnchorEl(null);
   };
 
-  const renderHeaderTable = () => {
-    return (
-      <Box component="div" sx={{ marginBottom: 2, backgroundColor: 'white' }}>
-        <Typography variant="h4" fontWeight="bold">
-          Property Three
-        </Typography>
-        <Typography variant="body1">456 Elm St, Springfield, USA</Typography>
-      </Box>
-    );
-  };
-
   const renderDataTable = () => {
     return data.map((item, index) => ({
       no: index + 1,
@@ -61,7 +57,7 @@ const PropertiesDetail = () => {
       actions: (
         <div key={index}>
           <Button variant="text" color="primary" onClick={handleOpenMenu}>
-            <EditIcon />
+            <MoreVert />
           </Button>
           <PositionedMenu
             anchorEl={anchorEl}
@@ -86,9 +82,11 @@ const PropertiesDetail = () => {
 
   return (
     <Box component="div" sx={{ padding: 2, backgroundColor: '#FAFBFD' }}>
+      <FormProperties isOpen={openFormProperties} onClose={handleToggleFormProperties} />
+
       <Box component={'div'} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, marginBottom: 2 }}>
-        <Button variant="outlined" color="primary" startIcon={<AddIcon />}>
-          Add Tenant
+        <Button variant="outlined" color="primary" onClick={handleToggleFormProperties} startIcon={<AddIcon />}>
+          Add Room
         </Button>
         <Button variant="outlined" color="warning" startIcon={<EditIcon />}>
           Edit
@@ -98,9 +96,32 @@ const PropertiesDetail = () => {
         </Button>
       </Box>
 
+      <Card className="shadow-sm mb-8">
+        <CardContent>
+          <Typography variant="h4" fontWeight="bold">
+            Property Three
+          </Typography>
+          <Typography variant="body1" className="mb-2">
+            456 Elm St, Springfield, USA
+          </Typography>
+          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+            <div>
+              <strong>Size:</strong> 1200 sqft
+            </div>
+            <div>
+              <strong>Total Rooms:</strong> 3
+            </div>
+            <div>
+              <strong>Base Rent:</strong> $1,500
+            </div>
+            <div>
+              <strong>Status:</strong> <span className="capitalize">occupied</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       <Box>
         <TableCommon
-          header={renderHeaderTable()}
           headName={['No.', 'Name', 'Type', 'size', 'Price', 'Status', 'Actions']}
           data={renderDataTable()}
         />

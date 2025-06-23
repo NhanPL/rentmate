@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from
 import React from 'react';
 
 type TableCommonProps = {
-  header: React.ReactNode;
+  header?: React.ReactNode;
   data: object[];
   headName: string[];
 };
