@@ -7,17 +7,16 @@ const SideBar = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   useEffect(() => {
     setSelectedIndex(() => {
-      switch (location.pathname) {
-        case '/dashboard':
-          return 0;
-        case '/properties':
-          return 1;
-        case '/tenants':
-          return 2;
-        case '/reports':
-          return 3;
-        default:
-          return 0;
+      if (location.pathname.includes('/dashboard')) {
+        return 0;
+      } else if (location.pathname.includes('/properties')) {
+        return 1;
+      } else if (location.pathname.includes('/tenants')) {
+        return 2;
+      } else if (location.pathname.includes('/reports')) {
+        return 3;
+      } else {
+        return 0;
       }
     });
   }, [location.pathname]);

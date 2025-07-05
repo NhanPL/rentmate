@@ -1,4 +1,4 @@
-import { MoreVert } from '@mui/icons-material';
+import { MoreVert, Visibility } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -6,15 +6,26 @@ import { Box, Button, Card, CardContent, Chip, Typography } from '@mui/material'
 import { DeleteIcon } from 'lucide-react';
 import { useState } from 'react';
 import FormProperties from '../../components/form/formProperties/FormProperties';
+import FormRoom from '../../components/form/formRoom/FormRoom';
 import PositionedMenu, { SharedMenuItem } from '../../components/positionedMenu/PositionedMenu';
 import TableCommon from '../../components/tableCommon/TableCommon';
 import { formatNumberIntl } from '../../utils/format';
 import data from './dataListRoom.json';
+import { useNavigate } from 'react-router';
 
 const PropertiesDetail = () => {
   const [openFormProperties, setOpenFormProperties] = useState(false);
+  const [openFormRoom, setOpenFormRoom] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState<number | string | null>(null);
+
+  const navigate = useNavigate();
+
   const handleToggleFormProperties = () => {
     setOpenFormProperties(!openFormProperties);
+  };
+
+  const handleToggleFormRoom = () => {
+    setOpenFormRoom(!openFormRoom);
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -22,19 +33,29 @@ const PropertiesDetail = () => {
 
   const menuItems: SharedMenuItem[] = [
     {
+      label: 'Xem chi tiết',
+      icon: <Visibility fontSize="small" />,
+      onClick: () => changeViewDetailRoom(),
+    },
+    {
       label: 'Chỉnh sửa',
       icon: <EditIcon fontSize="small" />,
-      onClick: (i) => alert('Chỉnh sửa' + i),
+      onClick: () => alert('Chỉnh sửa' + selectedRowId),
     },
     {
       label: 'Xoá',
       icon: <DeleteIcon fontSize="small" />,
-      onClick: (i) => alert('Xoá' + i),
+      onClick: () => alert('Xoá' + selectedRowId),
     },
   ];
 
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const changeViewDetailRoom = () => {
+    navigate(`/properties/1/rooms/${selectedRowId}`);
+  };
+
+  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, id: number) => {
     setAnchorEl(event.currentTarget);
+    setSelectedRowId(id);
   };
 
   const handleCloseMenu = () => {
@@ -56,25 +77,9 @@ const PropertiesDetail = () => {
         ),
       actions: (
         <div key={index}>
-          <Button variant="text" color="primary" onClick={handleOpenMenu}>
+          <Button variant="text" color="primary" onClick={(e) => handleOpenMenu(e, index)} aria-label="more">
             <MoreVert />
           </Button>
-          <PositionedMenu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleCloseMenu}
-            aria-labelledby="demo-positioned-button"
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-            items={menuItems}
-            id={'' + index}
-          ></PositionedMenu>
         </div>
       ),
     }));
@@ -83,12 +88,29 @@ const PropertiesDetail = () => {
   return (
     <Box component="div" sx={{ padding: 2, backgroundColor: '#FAFBFD' }}>
       <FormProperties isOpen={openFormProperties} onClose={handleToggleFormProperties} />
+      <FormRoom isOpen={openFormRoom} onClose={handleToggleFormRoom} />
+      <PositionedMenu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleCloseMenu}
+        aria-labelledby="demo-positioned-button"
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        items={menuItems}
+        id={''}
+      ></PositionedMenu>
 
       <Box component={'div'} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, marginBottom: 2 }}>
-        <Button variant="outlined" color="primary" onClick={handleToggleFormProperties} startIcon={<AddIcon />}>
+        <Button variant="outlined" color="primary" onClick={handleToggleFormRoom} startIcon={<AddIcon />}>
           Add Room
         </Button>
-        <Button variant="outlined" color="warning" startIcon={<EditIcon />}>
+        <Button variant="outlined" color="warning" onClick={handleToggleFormProperties} startIcon={<EditIcon />}>
           Edit
         </Button>
         <Button variant="outlined" color="info" startIcon={<FilterAltIcon />}>
