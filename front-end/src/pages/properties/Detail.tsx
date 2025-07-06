@@ -1,4 +1,4 @@
-import { MoreVert, Visibility } from '@mui/icons-material';
+import { ArrowLeft, MoreVert, Visibility } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -11,7 +11,7 @@ import PositionedMenu, { SharedMenuItem } from '../../components/positionedMenu/
 import TableCommon from '../../components/tableCommon/TableCommon';
 import { formatNumberIntl } from '../../utils/format';
 import data from './dataListRoom.json';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 const PropertiesDetail = () => {
   const [openFormProperties, setOpenFormProperties] = useState(false);
@@ -107,7 +107,13 @@ const PropertiesDetail = () => {
       ></PositionedMenu>
 
       <Box component={'div'} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, marginBottom: 2 }}>
-        <Button variant="outlined" color="primary" onClick={handleToggleFormRoom} startIcon={<AddIcon />}>
+        <Link to={`/properties`}>
+          <Button variant="outlined">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Apartment
+          </Button>
+        </Link>
+        <Button variant="outlined" color="success" onClick={handleToggleFormRoom} startIcon={<AddIcon />}>
           Add Room
         </Button>
         <Button variant="outlined" color="warning" onClick={handleToggleFormProperties} startIcon={<EditIcon />}>
