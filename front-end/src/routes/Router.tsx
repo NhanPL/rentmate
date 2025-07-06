@@ -9,6 +9,7 @@ import AdminLayout from '../layouts/adminLayout/AdminLayout';
 import Properties from '../pages/properties/Properties';
 import PropertiesDetail from '../pages/properties/Detail';
 import Room from '../pages/room/Room';
+import Tenants from '../pages/tenants/Tenants';
 
 const AppRouter: React.FC = () => {
   return (
@@ -68,7 +69,7 @@ const AppRouter: React.FC = () => {
           element={
             <CommonLayout>
               <AdminLayout>
-                <Dashboard />
+                <Tenants />
               </AdminLayout>
             </CommonLayout>
           }
