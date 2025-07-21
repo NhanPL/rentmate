@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router';
 import NotFound from '../pages/notFound/NoteFound';
 import Login from '../pages/login/Login.container';
-import Test from '../pages/test/Test';
 import CommonLayout from '../layouts/commonLayout/CommonLayout';
 import Dashboard from '../pages/dashboard/Dashboard';
 import AdminLayout from '../layouts/adminLayout/AdminLayout';
@@ -81,14 +80,6 @@ const AppRouter: React.FC = () => {
               <AdminLayout>
                 <Dashboard />
               </AdminLayout>
-            </CommonLayout>
-          }
-        />
-        <Route
-          path="/test"
-          element={
-            <CommonLayout>
-              <Test />
             </CommonLayout>
           }
         />
