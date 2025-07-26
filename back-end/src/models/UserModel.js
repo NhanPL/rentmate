@@ -1,10 +1,7 @@
-const { Pool } = require("pg");
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // hoặc config riêng
-});
+const pool = require("../db/pool"); // Sửa lại đường dẫn pool dùng chung
 
 const findByUsername = async (username) => {
+  // Sửa lại cú pháp truy vấn tham số
   const res = await pool.query("SELECT * FROM users WHERE username = $1", [
     username,
   ]);
