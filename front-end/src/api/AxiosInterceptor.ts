@@ -1,8 +1,10 @@
-// src/api/axiosInstance.ts
 import axios from 'axios';
 
+// Lấy biến môi trường đúng cách cho React
+const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL;
+
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL,
+  baseURL: API_BASE_URL,
   withCredentials: true, // gửi cookie chứa refresh token
 });
 
@@ -13,10 +15,11 @@ API.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    if (!process.env.REACT_APP_API_BASE_URL) {
-      throw new Error('REACT_APP_API_BASE_URL is not defined');
+    if (!API_BASE_URL) {
+      throw new Error('API_BASE_URL is not defined');
     }
-    config.url = process.env.REACT_APP_API_BASE_URL + config.url;
+    // Không cần cộng lại baseURL nếu đã có trong axios.create
+    // config.url = API_BASE_URL + config.url; // Xóa dòng này
     return config;
   },
   (error) => Promise.reject(error)
@@ -60,11 +63,7 @@ API.interceptors.response.use(
 
       try {
         // Gửi refresh token (trong cookie) để lấy access token mới
-        const res = await axios.post(
-          process.env.REACT_APP_API_BASE_URL + '/auth/refresh-token',
-          {},
-          { withCredentials: true }
-        );
+        const res = await axios.post(API_BASE_URL + '/auth/refresh-token', {}, { withCredentials: true });
 
         const newAccessToken = res.data.accessToken;
         localStorage.setItem('accessToken', newAccessToken);

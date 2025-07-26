@@ -14,7 +14,7 @@ export const registerUser = async (userData: { username: string; password: strin
 // Function to log in a user
 export const loginUser = async (credentials: { username: string; password: string }) => {
   try {
-    const response = await API.post(`/login`, credentials);
+    const response = await API.post(`/auth/login`, credentials);
     return response.data;
   } catch (error) {
     console.error('Error logging in:', error);
