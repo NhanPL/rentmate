@@ -26,7 +26,7 @@ export const loginUser = async (credentials: { username: string; password: strin
 export const logoutUser = async (token: string) => {
   try {
     const response = await API.post(
-      `/logout`,
+      `/auth/logout`,
       {},
       {
         headers: {

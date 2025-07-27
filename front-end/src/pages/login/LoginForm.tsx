@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { loginUser } from '../../api/auth';
 import { useNavigate } from 'react-router';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../stores/slices/authSlice';
 
 interface LoginFormInputs {
   email: string;
@@ -21,16 +23,23 @@ const LoginForm = () => {
     },
   });
 
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setError(null);
     try {
-      // Gọi API login, truyền username là email
       const res = await loginUser({ username: data.email, password: data.password });
       localStorage.setItem('accessToken', res.accessToken);
       localStorage.setItem('refreshToken', res.refreshToken);
-      navigate('/dashboard'); // Chuyển hướng đến trang dashboard sau khi đăng nhập thành công
+      dispatch(
+        loginSuccess({
+          user: { id: '123', name: 'Nhân', email: 'nhan@example.com' },
+          token: res.token,
+        })
+      );
+      navigate('/dashboard');
     } catch (_err) {
       console.log('Login failed:', _err);
       setError('Sai tài khoản hoặc mật khẩu');
