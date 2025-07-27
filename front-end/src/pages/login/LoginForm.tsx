@@ -7,6 +7,7 @@ import { loginUser } from '../../api/auth';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../stores/slices/authSlice';
+import { setLoading } from '../../stores/slices/loadingSlice';
 
 interface LoginFormInputs {
   email: string;
@@ -29,6 +30,7 @@ const LoginForm = () => {
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setError(null);
+    dispatch(setLoading(true)); // Bắt đầu loading
     try {
       const res = await loginUser({ username: data.email, password: data.password });
       localStorage.setItem('accessToken', res.accessToken);
@@ -43,6 +45,8 @@ const LoginForm = () => {
     } catch (_err) {
       console.log('Login failed:', _err);
       setError('Sai tài khoản hoặc mật khẩu');
+    } finally {
+      dispatch(setLoading(false)); // Kết thúc loading
     }
   };
 
