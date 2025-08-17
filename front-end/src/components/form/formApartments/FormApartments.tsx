@@ -34,7 +34,7 @@ interface ApartmentFormDialogProps {
   initialData?: Apartment;
 }
 
-const FormProperties: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, initialData }) => {
+const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, initialData }) => {
   const {
     register,
     handleSubmit,
@@ -109,7 +109,7 @@ const FormProperties: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, i
           <Box sx={{ padding: '16px 0' }}>
             <TextField
               id="outlined-basic"
-              label="Name Properties"
+              label="Name Apartments"
               variant="outlined"
               fullWidth
               {...register('name')}
@@ -184,4 +184,4 @@ const FormProperties: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, i
   );
 };
 
-export default FormProperties;
+export default FormApartments;

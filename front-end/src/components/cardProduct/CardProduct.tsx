@@ -32,7 +32,7 @@ const CardProduct: React.FC<CardProductProps> = ({ name, price, location, imageU
         </div>
       </CardContent>
       <CardActions sx={{ justifyContent: 'flex-start' }}>
-        <Link to={`/properties/${name}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link to={`/Apartments/${name}`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <Button variant="contained">View Details</Button>
         </Link>
       </CardActions>

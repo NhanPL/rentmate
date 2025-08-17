@@ -5,7 +5,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { Box, Button, Card, CardContent, Chip, Typography } from '@mui/material';
 import { DeleteIcon } from 'lucide-react';
 import { useState } from 'react';
-import FormProperties from '../../components/form/formProperties/FormProperties';
+import FormApartments from '../../components/form/formApartments/FormApartments';
 import FormRoom from '../../components/form/formRoom/FormRoom';
 import PositionedMenu, { SharedMenuItem } from '../../components/positionedMenu/PositionedMenu';
 import TableCommon from '../../components/tableCommon/TableCommon';
@@ -13,15 +13,15 @@ import { formatNumberIntl } from '../../utils/format';
 import data from './dataListRoom.json';
 import { Link, useNavigate } from 'react-router';
 
-const PropertiesDetail = () => {
-  const [openFormProperties, setOpenFormProperties] = useState(false);
+const ApartmentsDetail = () => {
+  const [openFormApartments, setOpenFormApartments] = useState(false);
   const [openFormRoom, setOpenFormRoom] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState<number | string | null>(null);
 
   const navigate = useNavigate();
 
-  const handleToggleFormProperties = () => {
-    setOpenFormProperties(!openFormProperties);
+  const handleToggleFormApartments = () => {
+    setOpenFormApartments(!openFormApartments);
   };
 
   const handleToggleFormRoom = () => {
@@ -50,7 +50,7 @@ const PropertiesDetail = () => {
   ];
 
   const changeViewDetailRoom = () => {
-    navigate(`/properties/1/rooms/${selectedRowId}`);
+    navigate(`/Apartments/1/rooms/${selectedRowId}`);
   };
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, id: number) => {
@@ -87,7 +87,7 @@ const PropertiesDetail = () => {
 
   return (
     <Box component="div" sx={{ padding: 2, backgroundColor: '#FAFBFD' }}>
-      <FormProperties isOpen={openFormProperties} onClose={handleToggleFormProperties} />
+      <FormApartments isOpen={openFormApartments} onClose={handleToggleFormApartments} />
       <FormRoom isOpen={openFormRoom} onClose={handleToggleFormRoom} />
       <PositionedMenu
         anchorEl={anchorEl}
@@ -107,7 +107,7 @@ const PropertiesDetail = () => {
       ></PositionedMenu>
 
       <Box component={'div'} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, marginBottom: 2 }}>
-        <Link to={`/properties`}>
+        <Link to={`/Apartments`}>
           <Button variant="outlined">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Apartment
@@ -116,7 +116,7 @@ const PropertiesDetail = () => {
         <Button variant="outlined" color="success" onClick={handleToggleFormRoom} startIcon={<AddIcon />}>
           Add Room
         </Button>
-        <Button variant="outlined" color="warning" onClick={handleToggleFormProperties} startIcon={<EditIcon />}>
+        <Button variant="outlined" color="warning" onClick={handleToggleFormApartments} startIcon={<EditIcon />}>
           Edit
         </Button>
         <Button variant="outlined" color="info" startIcon={<FilterAltIcon />}>
@@ -158,4 +158,4 @@ const PropertiesDetail = () => {
   );
 };
 
-export default PropertiesDetail;
+export default ApartmentsDetail;
