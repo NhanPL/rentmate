@@ -213,7 +213,7 @@ const Room = () => {
       <PageHeader
         title={`Room 101`}
         actions={
-          <Link to={`/properties/1`}>
+          <Link to={`/Apartments/1`}>
             <Button variant="outlined">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Apartment

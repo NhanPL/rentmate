@@ -3,6 +3,12 @@ import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/materia
 import { Lock, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { loginUser } from '../../api/auth';
+import { useNavigate } from 'react-router';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../stores/slices/authSlice';
+import { setLoading } from '../../stores/slices/loadingSlice';
+
 interface LoginFormInputs {
   email: string;
   password: string;
@@ -10,6 +16,7 @@ interface LoginFormInputs {
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null); // Thêm state error
   const { register, handleSubmit } = useForm<LoginFormInputs>({
     defaultValues: {
       email: '',
@@ -17,8 +24,30 @@ const LoginForm = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<LoginFormInputs> = (data) => {
-    console.log(data);
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
+  const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
+    setError(null);
+    dispatch(setLoading(true)); // Bắt đầu loading
+    try {
+      const res = await loginUser({ username: data.email, password: data.password });
+      localStorage.setItem('accessToken', res.accessToken);
+      localStorage.setItem('refreshToken', res.refreshToken);
+      dispatch(
+        loginSuccess({
+          user: { id: '123', name: 'Nhân', email: 'nhan@example.com' },
+          token: res.token,
+        })
+      );
+      navigate('/dashboard');
+    } catch (_err) {
+      console.log('Login failed:', _err);
+      setError('Sai tài khoản hoặc mật khẩu');
+    } finally {
+      dispatch(setLoading(false)); // Kết thúc loading
+    }
   };
 
   return (
@@ -113,6 +142,11 @@ const LoginForm = () => {
       >
         Log In
       </Button>
+      {error && (
+        <Box color="error.main" mt={1} textAlign="center">
+          {error}
+        </Box>
+      )}
     </Box>
   );
 };

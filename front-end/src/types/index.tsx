@@ -6,3 +6,15 @@ export interface Apartment {
   rentAmount: number;
   status?: 'availabled' | 'occupied' | 'maintenance'; // Example status
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface AuthState {
+  isLoggedIn: boolean;
+  user: User | null;
+  token: string | null;
+}

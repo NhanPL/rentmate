@@ -40,7 +40,7 @@ const Dashboard = () => {
   const renderHeaderTable = () => {
     return (
       <Typography variant="h6" component="div" fontWeight={'bold'} sx={{ padding: 2 }}>
-        Recent Properties
+        Recent Apartments
       </Typography>
     );
   };
@@ -49,7 +49,7 @@ const Dashboard = () => {
     <Box component="div" sx={{ padding: 2, backgroundColor: '#FAFBFD' }}>
       <Box className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <CardOverview
-          title="Total Properties"
+          title="Total Apartments"
           count={6}
           icon={<AccountBalanceIcon sx={{ fontSize: 40, color: '#3E82CD' }} />}
           iconBgClr="#D7F1FF"

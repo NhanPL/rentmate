@@ -15,6 +15,7 @@
     "build": "pnpm build:front-end && pnpm build:back-end"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
   }
 }

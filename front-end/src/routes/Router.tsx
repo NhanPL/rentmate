@@ -1,19 +1,23 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router';
-import NotFound from '../pages/notFound/NoteFound';
-import Login from '../pages/login/Login.container';
-import CommonLayout from '../layouts/commonLayout/CommonLayout';
-import Dashboard from '../pages/dashboard/Dashboard';
+import { useSelector } from 'react-redux';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import AdminLayout from '../layouts/adminLayout/AdminLayout';
-import Properties from '../pages/properties/Properties';
-import PropertiesDetail from '../pages/properties/Detail';
+import CommonLayout from '../layouts/commonLayout/CommonLayout';
+import Apartments from '../pages/apartments/Apartments';
+import ApartmentsDetail from '../pages/apartments/Detail';
+import Dashboard from '../pages/dashboard/Dashboard';
+import Login from '../pages/login/Login.container';
+import NotFound from '../pages/notFound/NoteFound';
 import Room from '../pages/room/Room';
 import Tenants from '../pages/tenants/Tenants';
+import { AuthState } from '../types';
 
 const AppRouter: React.FC = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
+  const { token } = useSelector((state: { auth: AuthState }) => state.auth);
+
+  const renderPublicRoutes = () => {
+    return (
+      <>
         <Route
           path="/"
           element={
@@ -22,6 +26,15 @@ const AppRouter: React.FC = () => {
             </CommonLayout>
           }
         />
+        <Route path="/*" element={<Navigate to="/" replace />} />
+      </>
+    );
+  };
+
+  const renderPrivateRoutes = () => {
+    return (
+      <>
+        <Route path="/" element={<Navigate to={'/dashboard'} replace />} />
         <Route
           path="/dashboard"
           element={
@@ -34,27 +47,27 @@ const AppRouter: React.FC = () => {
           handle={{ title: 'Quản lý phòng' }}
         />
         <Route
-          path="/properties"
+          path="/apartments"
           element={
             <CommonLayout>
               <AdminLayout>
-                <Properties />
+                <Apartments />
               </AdminLayout>
             </CommonLayout>
           }
         />
         <Route
-          path="/properties/:id"
+          path="/apartments/:id"
           element={
             <CommonLayout>
               <AdminLayout>
-                <PropertiesDetail />
+                <ApartmentsDetail />
               </AdminLayout>
             </CommonLayout>
           }
         />
         <Route
-          path="/properties/:id/rooms/:idRoom"
+          path="/apartments/:id/rooms/:idRoom"
           element={
             <CommonLayout>
               <AdminLayout>
@@ -84,7 +97,13 @@ const AppRouter: React.FC = () => {
           }
         />
         <Route path="/*" element={<NotFound />} />
-      </Routes>
+      </>
+    );
+  };
+
+  return (
+    <BrowserRouter>
+      <Routes>{token ? renderPrivateRoutes() : renderPublicRoutes()}</Routes>
     </BrowserRouter>
   );
 };
