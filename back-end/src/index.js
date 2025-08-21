@@ -6,6 +6,7 @@ const apartmentRoutes = require("./routes/apartmentRoute");
 const tenantRoutes = require("./routes/tenantRoute");
 const contractRoutes = require("./routes/contractRoute");
 const paymentRoutes = require("./routes/paymentRoute");
+const uploadRoutes = require("./routes/uploadRoute");
 require("dotenv").config();
 
 const app = express();
@@ -26,6 +27,7 @@ app.use("/api/apartments", apartmentRoutes);
 app.use("/api/tenants", tenantRoutes);
 app.use("/api/contracts", contractRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/upload", uploadRoutes);
 
 app.listen(port, () => {
   console.log(`🚀 Server is running on port ${port}`);
