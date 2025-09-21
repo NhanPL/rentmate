@@ -2,9 +2,8 @@ export interface Apartment {
   id: string;
   name: string;
   address: string;
-  size: string; // e.g., "1200 sqft"
-  rentAmount: number;
-  status?: 'availabled' | 'occupied' | 'maintenance'; // Example status
+  fileUrl?: string;
+  fileId?: string;
 }
 
 export interface User {
@@ -16,5 +15,6 @@ export interface User {
 export interface AuthState {
   isLoggedIn: boolean;
   user: User | null;
-  token: string | null;
+  accessToken: string;
+  refreshToken: string;
 }

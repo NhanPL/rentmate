@@ -13,7 +13,7 @@ import Tenants from '../pages/tenants/Tenants';
 import { AuthState } from '../types';
 
 const AppRouter: React.FC = () => {
-  const { token } = useSelector((state: { auth: AuthState }) => state.auth);
+  const { accessToken } = useSelector((state: { auth: AuthState }) => state.auth);
 
   const renderPublicRoutes = () => {
     return (
@@ -103,7 +103,7 @@ const AppRouter: React.FC = () => {
 
   return (
     <BrowserRouter>
-      <Routes>{token ? renderPrivateRoutes() : renderPublicRoutes()}</Routes>
+      <Routes>{accessToken ? renderPrivateRoutes() : renderPublicRoutes()}</Routes>
     </BrowserRouter>
   );
 };

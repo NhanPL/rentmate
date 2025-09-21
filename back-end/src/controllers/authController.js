@@ -1,15 +1,13 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/UserModel");
+const RefreshTokenModel = require("../models/refeshTokenModel");
 require("dotenv").config();
 
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
-const ACCESS_TOKEN_EXPIRES_IN = "15m";
-const REFRESH_TOKEN_EXPIRES_IN = "7d";
-
-// Lưu refresh token (có thể lưu vào DB, ở đây demo lưu tạm trong RAM)
-let refreshTokens = [];
+const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || "15m";
+const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || "7d";
 
 const register = async (req, res) => {
   const { username, password, full_name, email } = req.body;
@@ -42,49 +40,49 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { username, password } = req.body;
-
   try {
-    const user = await UserModel.findByUsername(username);
-
+    const user = await UserModel.findByUsername(req.body.username);
     if (!user) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      return res.status(401).json({ message: "Email not exists!" });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid username or password" });
-    }
-
-    // Tạo JWT
-    const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      user.password
     );
+    if (!validPassword) {
+      return res.status(401).json({ message: "Password is not correct!" });
+    }
 
     const accessToken = jwt.sign(
-      { id: user.id, username: user.username },
-      ACCESS_TOKEN_SECRET,
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
       { expiresIn: ACCESS_TOKEN_EXPIRES_IN }
     );
+
     const refreshToken = jwt.sign(
-      { id: user.id, username: user.username },
-      REFRESH_TOKEN_SECRET,
+      { id: user.id, email: user.email },
+      process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: REFRESH_TOKEN_EXPIRES_IN }
     );
-    refreshTokens.push(refreshToken);
 
-    res.json({ message: "Login successful", token, accessToken, refreshToken });
+    await RefreshTokenModel.create(user.id, refreshToken);
+    const { password, ...userWithoutPassword } = user;
+
+    res.json({
+      message: "Login successfully!",
+      accessToken,
+      refreshToken,
+      user: userWithoutPassword,
+    });
   } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ message: "Server error" });
+    console.error(err);
+    res.status(500).json({ message: "Server Error!" });
   }
 };
 
 const refreshToken = (req, res) => {
   const { refreshToken } = req.body;
-  if (!refreshToken || !refreshTokens.includes(refreshToken)) {
+  if (!refreshToken) {
     return res.status(403).json({ message: "Refresh token not found" });
   }
   jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
@@ -97,10 +95,14 @@ const refreshToken = (req, res) => {
   });
 };
 
-const logout = (req, res) => {
+const logout = async (req, res) => {
   const { refreshToken } = req.body;
-  refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
-  res.status(204).end();
+  try {
+    await RefreshTokenModel.delete(refreshToken);
+    res.json({ message: "Logout successfully!" });
+  } catch (err) {
+    res.status(500).json({ message: "Server Error!" });
+  }
 };
 
 module.exports = { register, login, refreshToken, logout };

@@ -1,32 +1,22 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from '@mui/material';
-import React from 'react';
-import UploadFileButton from '../../uploadFileButton/UploadFileButton';
-import { Controller, useForm } from 'react-hook-form';
-import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Box, Button, Dialog, TextField, Typography } from '@mui/material';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 import { Apartment } from '../../../types';
+import UploadFileButton from '../../uploadFileButton/UploadFileButton';
+import { addApartment, updateApartment } from '../../../api/apartment';
+import { uploadFile } from '../../../api/upload';
 
 const apartmentSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3, 'Name must be at least 3 characters'),
   address: z.string().min(5, 'Address must be at least 5 characters'),
-  size: z.string().min(3, 'Size is required (e.g., 1000 sqft)'),
-  rentAmount: z.coerce.number().min(0, 'Rent amount cannot be negative'),
-  status: z.enum(['availabled', 'occupied', 'maintenance']).optional(),
+  fileUrl: z.string().optional(),
+  fileId: z.string().optional(),
 });
 
-type ApartmentFormData = z.infer<typeof apartmentSchema>;
+export type ApartmentFormData = z.infer<typeof apartmentSchema>;
 
 interface ApartmentFormDialogProps {
   isOpen: boolean;
@@ -35,26 +25,39 @@ interface ApartmentFormDialogProps {
 }
 
 const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, initialData }) => {
+  const [file, setFile] = React.useState<File | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
-    control,
     reset: formReset,
   } = useForm<ApartmentFormData>({
     resolver: zodResolver(apartmentSchema),
     defaultValues: initialData || {
       name: '',
       address: '',
-      size: '',
-      rentAmount: 0,
-      status: 'availabled',
+      fileUrl: '',
+      fileId: '',
     },
   });
 
-  const onSubmit = (data: ApartmentFormData) => {
-    console.log('Submitted data:', data);
-    onClose(); // Close the dialog after submission
+  const onSubmit = async (data: ApartmentFormData) => {
+    try {
+      if (initialData) {
+        // Update existing apartment
+        await updateApartment(initialData.id, data);
+      } else {
+        if (file) {
+          const { url: fileUrl, public_id: fileId } = await uploadFile(file);
+          data = { ...data, fileUrl, fileId };
+        }
+        // Add new apartment
+        await addApartment(data);
+      }
+      onClose(); // Close the dialog after submission
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
   };
 
   React.useEffect(() => {
@@ -64,9 +67,6 @@ const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, i
       formReset({
         name: '',
         address: '',
-        size: '',
-        rentAmount: 0,
-        status: 'availabled',
       });
     }
   }, [initialData, formReset, isOpen]);
@@ -127,48 +127,10 @@ const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, i
             helperText={errors.address ? errors.address.message : ''}
           />
           <Box sx={{ display: 'flex', gap: 2, padding: '16px 0' }}>
-            <TextField
-              id="outlined-basic"
-              label="Price"
-              variant="outlined"
-              type="number"
-              fullWidth
-              {...register('size')}
-              error={!!errors.size}
-              helperText={errors.size ? errors.size.message : ''}
-            />
-            <FormControl fullWidth error={!!errors.status}>
-              <InputLabel id="demo-simple-select-label">Status:</InputLabel>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Status"
-                    {...field}
-                    value={field.value || ''}
-                  >
-                    <MenuItem value={'availabled'}>Availabled</MenuItem>
-                    <MenuItem value={'occupied'}>Occupied</MenuItem>
-                    <MenuItem value={'maintaince'}>Maintaince</MenuItem>
-                  </Select>
-                )}
-              />
-
-              {errors.status && <FormHelperText>{errors.status.message}</FormHelperText>}
-            </FormControl>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 2, padding: '16px 0' }}>
             <Typography variant="subtitle1" sx={{ marginBottom: 2 }}>
               Images:
             </Typography>
-            <UploadFileButton
-              accept=".jpg,.png,.pdf"
-              onFileChange={(file) => console.log('File được chọn:', file)}
-              previewImg
-            />
+            <UploadFileButton accept=".jpg,.png,.pdf" onFileChange={(file) => setFile(file)} previewImg />
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2, gap: 2 }}>
             <Button variant="contained" color="secondary" type="reset" onClick={onClose}>

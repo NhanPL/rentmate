@@ -1,11 +1,9 @@
 import loginBg from '@/assets/images/login-bg.jpg';
 import { Box } from '@mui/material';
-import { useEffect } from 'react';
+import { useNavigator } from '../../hooks/useNavigator';
 
 const CommonLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  useEffect(() => {
-    console.log('first render');
-  }, []);
+  useNavigator();
   return (
     <Box
       sx={{

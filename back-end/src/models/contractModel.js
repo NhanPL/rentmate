@@ -1,6 +1,6 @@
 const pool = require("../db/pool");
 
-const Contract = {
+const ContractModel = {
   async getAll() {
     const res = await pool.query("SELECT * FROM rental_contracts");
     return res.rows;
@@ -33,4 +33,4 @@ const Contract = {
   },
 };
 
-module.exports = Contract;
+module.exports = ContractModel;

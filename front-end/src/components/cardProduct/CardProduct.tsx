@@ -1,17 +1,16 @@
 import { Button, Card, CardActions, CardContent, CardMedia } from '@mui/material';
 import React from 'react';
-import imgDefault from '../../assets/images/default.png';
-import { formatNumberIntl } from '../../utils/format';
 import { Link } from 'react-router';
+import imgDefault from '../../assets/images/default.png';
 
 type CardProductProps = {
+  apartmentId: string;
   name: string;
-  price: number;
   location: string;
   imageUrl?: string;
 };
 
-const CardProduct: React.FC<CardProductProps> = ({ name, price, location, imageUrl }) => {
+const CardProduct: React.FC<CardProductProps> = ({ apartmentId, name, location, imageUrl }) => {
   return (
     <Card sx={{ display: 'flex', flexDirection: 'column', borderRadius: 2, width: '100%' }}>
       <CardMedia
@@ -27,12 +26,11 @@ const CardProduct: React.FC<CardProductProps> = ({ name, price, location, imageU
       <CardContent>
         <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 'bold' }}>{name}</h2>
-          <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>${formatNumberIntl(price)}</p>
           <p style={{ fontSize: '1rem', color: '#666' }}>Location: {location}</p>
         </div>
       </CardContent>
       <CardActions sx={{ justifyContent: 'flex-start' }}>
-        <Link to={`/Apartments/${name}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link to={`/Apartments/${apartmentId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <Button variant="contained">View Details</Button>
         </Link>
       </CardActions>

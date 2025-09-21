@@ -9,13 +9,12 @@
   "scripts": {
     "dev:frontend": "pnpm --filter front-end dev",
     "dev:backend": "pnpm --filter back-end dev",
-    "dev": "concurrently \"pnpm dev:front-end\" \"pnpm dev:back-end\"",
+    "dev": "concurrently \"pnpm --prefix front-end run dev\" \"pnpm --prefix back-end run dev\"",
     "build:frontend": "pnpm --filter front-end build",
     "build:backend": "pnpm --filter back-end build",
     "build": "pnpm build:front-end && pnpm build:back-end"
   },
   "devDependencies": {
-  },
-  "dependencies": {
+    "concurrently": "^9.2.0"
   }
 }

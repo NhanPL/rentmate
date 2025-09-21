@@ -1,6 +1,6 @@
 const pool = require("../db/pool");
 
-const Apartment = {
+const ApartmentModel = {
   async getAll() {
     const res = await pool.query("SELECT * FROM apartments");
     return res.rows;
@@ -12,18 +12,18 @@ const Apartment = {
     return res.rows[0];
   },
   async create(data) {
-    const { name, address, description } = data;
+    const { name, address, fileId, fileUrl } = data;
     const res = await pool.query(
-      "INSERT INTO apartments (name, address, description) VALUES ($1, $2, $3) RETURNING *",
-      [name, address, description]
+      "INSERT INTO apartments (name, address, file_id, fileurl) VALUES ($1, $2, $3, $4) RETURNING *",
+      [name, address, fileId, fileUrl]
     );
     return res.rows[0];
   },
   async update(id, data) {
-    const { name, address, description } = data;
+    const { name, address, fileId } = data;
     const res = await pool.query(
-      "UPDATE apartments SET name = $1, address = $2, description = $3 WHERE id = $4 RETURNING *",
-      [name, address, description, id]
+      "UPDATE apartments SET name = $1, address = $2, file_id = $3 WHERE id = $4 RETURNING *",
+      [name, address, fileId, id]
     );
     return res.rows[0];
   },
@@ -32,4 +32,4 @@ const Apartment = {
   },
 };
 
-module.exports = Apartment;
+module.exports = ApartmentModel;

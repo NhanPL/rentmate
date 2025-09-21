@@ -49,3 +49,7 @@ ehthumbs.db
 
 # Images or uploads (if any)
 uploads/
+
+
+# Firebase
+firebase-key.json

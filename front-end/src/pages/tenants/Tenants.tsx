@@ -29,7 +29,6 @@ const Tenants: React.FC = () => {
 
   const filteredTenants = (data: { name: string; phone: string; status: string }) => {
     setFilterKeyword(data);
-    console.log(tenants, filterKeyword);
   };
 
   const headName = ['Name', 'Phone', 'Date start', 'Date end', 'Actions'];

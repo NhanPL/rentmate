@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const roomController = require("../controllers/roomController");
-const { authenticateJWT } = require("../middleware/authMiddleware");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-router.get("/", authenticateJWT, roomController.getRooms);
-router.get("/:id", authenticateJWT, roomController.getRoomById);
-router.post("/", authenticateJWT, roomController.createRoom);
-router.put("/:id", authenticateJWT, roomController.updateRoom);
-router.delete("/:id", authenticateJWT, roomController.deleteRoom);
+router.get("/", authMiddleware, roomController.getRooms);
+router.get("/:id", authMiddleware, roomController.getRoomById);
+router.post("/", authMiddleware, roomController.createRoom);
+router.put("/:id", authMiddleware, roomController.updateRoom);
+router.delete("/:id", authMiddleware, roomController.deleteRoom);
 
 module.exports = router;

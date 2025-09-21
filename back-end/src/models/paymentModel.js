@@ -1,6 +1,6 @@
 const pool = require("../db/pool");
 
-const Payment = {
+const PaymentModel = {
   async getAll() {
     const res = await pool.query("SELECT * FROM monthly_payments");
     return res.rows;
@@ -33,4 +33,4 @@ const Payment = {
   },
 };
 
-module.exports = Payment;
+module.exports = PaymentModel;
