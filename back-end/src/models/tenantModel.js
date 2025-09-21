@@ -1,6 +1,6 @@
 const pool = require("../db/pool");
 
-const Tenant = {
+const TenantModel = {
   async getAll() {
     const res = await pool.query("SELECT * FROM tenants");
     return res.rows;
@@ -30,4 +30,4 @@ const Tenant = {
   },
 };
 
-module.exports = Tenant;
+module.exports = TenantModel;

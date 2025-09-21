@@ -2,6 +2,9 @@ import { Box, Button, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
 import { logout } from '../../stores/slices/authSlice';
+import { logoutUser } from '../../api/auth';
+import { AuthState } from '../../types';
+import { useSelector } from 'react-redux';
 
 const routeTitles: Record<string, string> = {
   '/': 'Dashboard',
@@ -12,6 +15,7 @@ const routeTitles: Record<string, string> = {
 };
 
 const Header = ({ children }: { children: React.ReactNode }) => {
+  const { refreshToken } = useSelector((state: { auth: AuthState }) => state.auth);
   const location = useLocation();
   const pathname = location.pathname;
   const navigate = useNavigate();
@@ -22,7 +26,8 @@ const Header = ({ children }: { children: React.ReactNode }) => {
       .sort((a, b) => b[0].length - a[0].length)
       .find(([route]) => pathname.includes(route))?.[1] || 'Dashboard';
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutUser(refreshToken || '');
     dispatch(logout());
     navigate('/');
   };

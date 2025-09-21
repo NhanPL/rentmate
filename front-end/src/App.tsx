@@ -1,10 +1,10 @@
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import './App.css';
-import AppRouter from './routes/Router';
-import theme from './theme';
 import { Provider } from 'react-redux';
-import { store } from './stores/index';
+import './App.css';
 import AppLoadingProvider from './contexts/AppLoadingProvider';
+import AppRouter from './routes/Router';
+import { store } from './stores/index';
+import theme from './theme';
 
 function App() {
   return (

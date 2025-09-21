@@ -33,12 +33,12 @@ const LoginForm = () => {
     dispatch(setLoading(true)); // Bắt đầu loading
     try {
       const res = await loginUser({ username: data.email, password: data.password });
-      localStorage.setItem('accessToken', res.accessToken);
-      localStorage.setItem('refreshToken', res.refreshToken);
+      const { user, accessToken, refreshToken } = res;
       dispatch(
         loginSuccess({
-          user: { id: '123', name: 'Nhân', email: 'nhan@example.com' },
-          token: res.token,
+          user,
+          accessToken,
+          refreshToken,
         })
       );
       navigate('/dashboard');

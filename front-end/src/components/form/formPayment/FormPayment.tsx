@@ -49,7 +49,7 @@ const FormPayment: React.FC<FormPaymentProps> = ({ open, onClose, initialData })
   }, [initialData, open, reset]);
 
   const onSubmitForm = (data: PaymentFormData) => {
-    console.log(data);
+    console.log(data)
     onClose();
   };
 

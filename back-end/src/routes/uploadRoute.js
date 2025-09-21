@@ -2,11 +2,12 @@ const express = require("express");
 const multer = require("multer");
 const streamifier = require("streamifier");
 const router = express.Router();
+const authMiddleware = require("../middlewares/authMiddleware");
 const cloudinary = require("../cloudinary.js");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.post("/", upload.single("file"), async (req, res) => {
+router.post("/", authMiddleware, upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -41,7 +42,7 @@ router.post("/", upload.single("file"), async (req, res) => {
   }
 });
 
-router.delete("/:public_id", async (req, res) => {
+router.delete("/:public_id", authMiddleware, async (req, res) => {
   try {
     const { public_id } = req.params;
 
@@ -57,7 +58,7 @@ router.delete("/:public_id", async (req, res) => {
   }
 });
 
-router.put("/:public_id", upload.single("file"), async (req, res) => {
+router.put("/:public_id", authMiddleware, upload.single("file"), async (req, res) => {
   try {
     const { public_id } = req.params;
 

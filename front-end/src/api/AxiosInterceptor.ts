@@ -1,4 +1,10 @@
 import axios from 'axios';
+import { store } from '../stores';
+import { logout, setTokens } from '../stores/slices/authSlice';
+import { AuthState } from '../types';
+import { isTokenExpired } from '../utils/isTokenExpired';
+import { navigateTo } from '../utils/navigation';
+import { refreshTokenApi } from './auth';
 
 // Lấy biến môi trường đúng cách cho React
 const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -10,74 +16,48 @@ const API = axios.create({
 
 // Gắn access token cho tất cả request
 API.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+  async (config) => {
+    const { accessToken, refreshToken } = store.getState().auth as AuthState;
+    let accessTokenLocal = accessToken;
+
+    // Nếu request hiện tại là refresh-token thì bỏ qua
+    if (config.url?.includes('/refresh-token')) {
+      return config;
     }
-    if (!API_BASE_URL) {
-      throw new Error('API_BASE_URL is not defined');
+
+    // Nếu token hết hạn → gọi API refresh
+    if (accessToken && isTokenExpired(accessToken)) {
+      try {
+        const res = await refreshTokenApi(refreshToken);
+        const token = res.accessToken;
+
+        // Lưu token mới vào redux
+        store.dispatch(setTokens({ accessToken: token, refreshToken }));
+        accessTokenLocal = token; // cập nhật token mới để gắn vào request hiện tại
+      } catch (error) {
+        store.dispatch(logout());
+        navigateTo('/login');
+        return Promise.reject(error);
+      }
     }
-    // Không cần cộng lại baseURL nếu đã có trong axios.create
-    // config.url = API_BASE_URL + config.url; // Xóa dòng này
+
+    if (accessToken && config.headers) {
+      config.headers.Authorization = `Bearer ${accessTokenLocal}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-type FailedRequest = {
-  resolve: (token: string | null) => void;
-  reject: (error: unknown) => void;
-};
-
-// Xử lý tự động refresh token khi gặp lỗi 401
-let isRefreshing = false;
-let failedQueue: FailedRequest[] = [];
-
-const processQueue = (error: unknown, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) prom.reject(error);
-    else prom.resolve(token);
-  });
-  failedQueue = [];
-};
-
 API.interceptors.response.use(
-  (response) => response,
+  (response) => response, // nếu OK thì trả về luôn
   async (error) => {
-    const originalRequest = error.config;
+    const status = error.response?.status;
 
-    // Nếu bị lỗi 401 và chưa retry
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers['Authorization'] = `Bearer ${token}`;
-          return API(originalRequest);
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        // Gửi refresh token (trong cookie) để lấy access token mới
-        const res = await axios.post(API_BASE_URL + '/auth/refresh-token', {}, { withCredentials: true });
-
-        const newAccessToken = res.data.accessToken;
-        localStorage.setItem('accessToken', newAccessToken);
-        API.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-        processQueue(null, newAccessToken);
-
-        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-        return API(originalRequest);
-      } catch (err) {
-        processQueue(err, null);
-        return Promise.reject(err);
-      } finally {
-        isRefreshing = false;
-      }
+    if (status === 500) {
+      navigateTo('/error');
+    } else if (status === 404) {
+      navigateTo('/not-found');
     }
 
     return Promise.reject(error);
