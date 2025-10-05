@@ -4,19 +4,27 @@ import EditIcon from '@mui/icons-material/Edit';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { Box, Button, Card, CardContent, Chip, Typography } from '@mui/material';
 import { DeleteIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormApartments from '../../components/form/formApartments/FormApartments';
 import FormRoom from '../../components/form/formRoom/FormRoom';
 import PositionedMenu, { SharedMenuItem } from '../../components/positionedMenu/PositionedMenu';
 import TableCommon from '../../components/tableCommon/TableCommon';
 import { formatNumberIntl } from '../../utils/format';
-import data from './dataListRoom.json';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
+import { Room } from '../../types/Room';
+import { getRoomsByAparmentId } from '../../api/room';
+import { getApartmentByID } from '../../api/apartment';
+import { Apartment } from '../../types';
 
 const ApartmentsDetail = () => {
   const [openFormApartments, setOpenFormApartments] = useState(false);
-  const [openFormRoom, setOpenFormRoom] = useState(false);
-  const [selectedRowId, setSelectedRowId] = useState<number | string | null>(null);
+  const [isOpenFormRoom, setIsOpenFormRoom] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState<string>('');
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [room, setRoom] = useState<Room | null>(null);
+  const [apartment, setApartment] = useState<Apartment | null>(null);
+  const { id } = useParams<{ id: string }>();
+  const apartmentId = id!;
 
   const navigate = useNavigate();
 
@@ -24,8 +32,21 @@ const ApartmentsDetail = () => {
     setOpenFormApartments(!openFormApartments);
   };
 
-  const handleToggleFormRoom = () => {
-    setOpenFormRoom(!openFormRoom);
+  const openFormRoom = () => {
+    setIsOpenFormRoom(!isOpenFormRoom);
+  };
+
+  const openFormUpdateRoom = (id: string) => {
+    setRoom(rooms.find((item) => item.id === id) || null);
+    setIsOpenFormRoom(!isOpenFormRoom);
+  };
+
+  const closeFormRoom = async (isFetching: boolean = false) => {
+    if (isFetching) {
+      const data = await getRoomsByAparmentId(apartmentId);
+      setRooms(data);
+    }
+    setIsOpenFormRoom(!isOpenFormRoom);
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -40,7 +61,7 @@ const ApartmentsDetail = () => {
     {
       label: 'Chỉnh sửa',
       icon: <EditIcon fontSize="small" />,
-      onClick: () => alert('Chỉnh sửa' + selectedRowId),
+      onClick: () => openFormUpdateRoom(selectedRowId),
     },
     {
       label: 'Xoá',
@@ -50,10 +71,10 @@ const ApartmentsDetail = () => {
   ];
 
   const changeViewDetailRoom = () => {
-    navigate(`/Apartments/1/rooms/${selectedRowId}`);
+    navigate(`/apartments/1/rooms/${selectedRowId}`);
   };
 
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, id: number) => {
+  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, id: string) => {
     setAnchorEl(event.currentTarget);
     setSelectedRowId(id);
   };
@@ -63,21 +84,23 @@ const ApartmentsDetail = () => {
   };
 
   const renderDataTable = () => {
-    return data.map((item, index) => ({
+    return rooms.map((item, index) => ({
       no: index + 1,
       name: item.name,
       type: item.type,
       size: item.size,
       price: formatNumberIntl(item.price),
       status:
-        item.status == 'Available' ? (
+        item.status == 'availabled' ? (
           <Chip label="Availabled" color="success" />
-        ) : (
+        ) : item.status == 'occupied' ? (
           <Chip label="Occupied" color="error" />
+        ) : (
+          <Chip label="Maintaince" color="warning" />
         ),
       actions: (
         <div key={index}>
-          <Button variant="text" color="primary" onClick={(e) => handleOpenMenu(e, index)} aria-label="more">
+          <Button variant="text" color="primary" onClick={(e) => handleOpenMenu(e, item.id)} aria-label="more">
             <MoreVert />
           </Button>
         </div>
@@ -85,10 +108,25 @@ const ApartmentsDetail = () => {
     }));
   };
 
+  useEffect(() => {
+    document.title = 'Apartment Detail';
+    const fetchRooms = async () => {
+      const data = await getRoomsByAparmentId(apartmentId);
+      setRooms(data);
+    };
+
+    const fetchApartmentById = async () => {
+      const data = await getApartmentByID(apartmentId);
+      setApartment(data);
+    };
+    fetchRooms();
+    fetchApartmentById();
+  }, [apartmentId]);
+
   return (
     <Box component="div" sx={{ padding: 2, backgroundColor: '#FAFBFD' }}>
       <FormApartments isOpen={openFormApartments} onClose={handleToggleFormApartments} />
-      <FormRoom isOpen={openFormRoom} onClose={handleToggleFormRoom} />
+      <FormRoom isOpen={isOpenFormRoom} initialData={room} onClose={closeFormRoom} apartmentId={apartmentId} />
       <PositionedMenu
         anchorEl={anchorEl}
         open={open}
@@ -113,7 +151,7 @@ const ApartmentsDetail = () => {
             Back to Apartment
           </Button>
         </Link>
-        <Button variant="outlined" color="success" onClick={handleToggleFormRoom} startIcon={<AddIcon />}>
+        <Button variant="outlined" color="success" onClick={openFormRoom} startIcon={<AddIcon />}>
           Add Room
         </Button>
         <Button variant="outlined" color="warning" onClick={handleToggleFormApartments} startIcon={<EditIcon />}>
@@ -127,25 +165,11 @@ const ApartmentsDetail = () => {
       <Card className="shadow-sm mb-8">
         <CardContent>
           <Typography variant="h4" fontWeight="bold">
-            Property Three
+            {apartment?.name}
           </Typography>
           <Typography variant="body1" className="mb-2">
-            456 Elm St, Springfield, USA
+            {apartment?.address}
           </Typography>
-          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-            <div>
-              <strong>Size:</strong> 1200 sqft
-            </div>
-            <div>
-              <strong>Total Rooms:</strong> 3
-            </div>
-            <div>
-              <strong>Base Rent:</strong> $1,500
-            </div>
-            <div>
-              <strong>Status:</strong> <span className="capitalize">occupied</span>
-            </div>
-          </div>
         </CardContent>
       </Card>
       <Box>
