@@ -1,8 +1,8 @@
 const RoomModel = require("../models/RoomModel");
 
-const getRooms = async (req, res) => {
+const getRoomByAparmentId = async (req, res) => {
   try {
-    const rooms = await RoomModel.getAll();
+    const rooms = await RoomModel.getAllRoomByApartmentId(req.params.id);
     res.json(rooms);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -34,6 +34,7 @@ const updateRoom = async (req, res) => {
     if (!room) return res.status(404).json({ message: "Room not found" });
     res.json(room);
   } catch (err) {
+    console.log("error: ", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -47,4 +48,10 @@ const deleteRoom = async (req, res) => {
   }
 };
 
-module.exports = { getRooms, getRoomById, createRoom, updateRoom, deleteRoom };
+module.exports = {
+  getRoomByAparmentId,
+  getRoomById,
+  createRoom,
+  updateRoom,
+  deleteRoom,
+};

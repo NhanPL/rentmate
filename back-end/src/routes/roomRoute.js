@@ -3,7 +3,11 @@ const router = express.Router();
 const roomController = require("../controllers/roomController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
-router.get("/", authMiddleware, roomController.getRooms);
+router.get(
+  "/apartment/:id",
+  authMiddleware,
+  roomController.getRoomByAparmentId
+);
 router.get("/:id", authMiddleware, roomController.getRoomById);
 router.post("/", authMiddleware, roomController.createRoom);
 router.put("/:id", authMiddleware, roomController.updateRoom);

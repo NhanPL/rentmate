@@ -5,6 +5,7 @@ import { AuthState } from '../types';
 import { isTokenExpired } from '../utils/isTokenExpired';
 import { navigateTo } from '../utils/navigation';
 import { refreshTokenApi } from './auth';
+import camelcaseKeys from 'camelcase-keys';
 
 // Lấy biến môi trường đúng cách cho React
 const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -50,7 +51,13 @@ API.interceptors.request.use(
 );
 
 API.interceptors.response.use(
-  (response) => response, // nếu OK thì trả về luôn
+  (response) => {
+    if (response.data && typeof response.data === 'object') {
+      // deep: true để chuyển đổi cả các object con
+      response.data = camelcaseKeys(response.data, { deep: true });
+    }
+    return response;
+  }, // nếu OK thì trả về luôn
   async (error) => {
     const status = error.response?.status;
 

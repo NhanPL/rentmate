@@ -1,64 +1,102 @@
-import { Box, Button, Card, IconButton, Typography } from '@mui/material';
-import { Edit, PlusCircle, Trash2 } from 'lucide-react';
-import React from 'react';
-import FormTenant, { TenantFormData } from '../../components/form/formTenant/FormTenant';
+import { Delete, Edit, Home, MoreVert, Visibility } from '@mui/icons-material';
+import { Box, Button, Card, Typography } from '@mui/material';
+import { PlusCircle } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { getAllTenants } from '../../api/tenant';
+import { RentalForm } from '../../components/form/formRental/FormRental';
+import FormTenant from '../../components/form/formTenant/FormTenant';
+import PositionedMenu, { SharedMenuItem } from '../../components/positionedMenu/PositionedMenu';
 import TableCommon from '../../components/tableCommon/TableCommon';
+import { formatDate } from '../../utils/format';
 import TenantFilter from './TenantFilter';
-
-const initialTenants: TenantFormData[] = [
-  {
-    name: 'John Doe',
-    contactInfo: '034-567-8901',
-    leaseStartDate: '2023-01-01',
-    leaseEndDate: '',
-  },
-  {
-    name: 'Jane Smith',
-    contactInfo: '012-345-6789',
-    leaseStartDate: '2023-02-01',
-    leaseEndDate: '2024-01-31',
-  },
-];
+import { Tenant } from '../../types';
 
 const Tenants: React.FC = () => {
   const [openForm, setOpenForm] = React.useState(false);
+  const [openFormRental, setOpenFormRental] = React.useState(false);
   const [openFilter, setOpenFilter] = React.useState(false);
-  const [filterKeyword, setFilterKeyword] = React.useState({ name: '', phone: '', status: '' });
-  const [tenants, setTenants] = React.useState<TenantFormData[]>(initialTenants);
-  const [editTenant, setEditTenant] = React.useState<TenantFormData | null>(null);
+  const [filterKeyword, setFilterKeyword] = React.useState({ name: '', phone: '', room: '' });
+  const [tenants, setTenants] = React.useState<Tenant[]>([]);
+  const [editTenant, setEditTenant] = React.useState<Tenant | null>(null);
+  const [selectedRowId, setSelectedRowId] = React.useState<string>('');
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
-  const filteredTenants = (data: { name: string; phone: string; status: string }) => {
+  const filteredTenants = (data: { name: string; phone: string; room: string }) => {
     setFilterKeyword(data);
   };
 
-  const headName = ['Name', 'Phone', 'Date start', 'Date end', 'Actions'];
+  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, id: string) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedRowId(id);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleToggleFormRental = () => {
+    if (openFormRental) {
+      setSelectedRowId('');
+    }
+    setOpenFormRental(!openFormRental);
+  };
+
+  const headName = ['Name', 'Card ID', 'Gender', 'Birthday', 'Phone', 'Room', 'Apartment', 'Actions'];
+
+  const menuItems: SharedMenuItem[] = [
+    {
+      label: 'Xem chi tiết',
+      color: 'primary',
+      icon: <Visibility fontSize="small" />,
+      onClick: () => {},
+    },
+    {
+      label: 'Chỉnh sửa',
+      color: 'info',
+      icon: <Edit fontSize="small" />,
+      onClick: () => {},
+    },
+    {
+      label: 'Thuê phòng',
+      color: 'warning',
+      icon: <Home fontSize="small" />,
+      onClick: () => {
+        handleToggleFormRental();
+      },
+    },
+    {
+      label: 'Xoá',
+      color: 'error',
+      icon: <Delete fontSize="small" />,
+      onClick: () => {},
+    },
+  ];
+
   const data = tenants.map((tenant, idx) => ({
     name: tenant.name,
-    contactInfo: tenant.contactInfo,
-    leaseStartDate: tenant.leaseStartDate,
-    leaseEndDate: tenant.leaseEndDate || '---',
+    cardId: tenant.cardId,
+    gender: tenant.gender,
+    birthday: formatDate(tenant.birthday),
+    phone: tenant.phone,
+    room: '---',
+    apartment: '---',
     actions: (
-      <>
-        <IconButton
-          color="primary"
-          onClick={() => {
-            setEditTenant(tenant);
-            setOpenForm(true);
-          }}
-        >
-          <Edit size={18} />
-        </IconButton>
-        <IconButton
-          color="error"
-          onClick={() => {
-            setTenants((prev) => prev.filter((_, i) => i !== idx));
-          }}
-        >
-          <Trash2 size={18} />
-        </IconButton>
-      </>
+      <div key={idx}>
+        <Button variant="text" color="primary" onClick={(e) => handleOpenMenu(e, tenant.id)} aria-label="more">
+          <MoreVert />
+        </Button>
+      </div>
     ),
   }));
+
+  useEffect(() => {
+    const fetchTenants = async () => {
+      const tenantData = await getAllTenants();
+      setTenants(tenantData);
+    };
+    fetchTenants();
+  }, []);
 
   return (
     <Box className="flex flex-col gap-6 p-4">
@@ -93,12 +131,29 @@ const Tenants: React.FC = () => {
         }}
         initialData={editTenant || undefined}
       />
+      <RentalForm open={openFormRental} onClose={handleToggleFormRental} tenantId={selectedRowId}></RentalForm>
       <TenantFilter
         open={openFilter}
         onClose={() => setOpenFilter(false)}
         onFilter={filteredTenants}
         initialFilter={filterKeyword}
       />
+      <PositionedMenu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleCloseMenu}
+        aria-labelledby="demo-positioned-button"
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        items={menuItems}
+        id={''}
+      ></PositionedMenu>
     </Box>
   );
 };

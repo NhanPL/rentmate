@@ -1,24 +1,18 @@
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField } from '@mui/material';
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Grid, MenuItem } from '@mui/material';
 
 type TenantFilterProps = {
   open: boolean;
   onClose: () => void;
-  onFilter: (filter: { name: string; phone: string; status: string }) => void;
-  initialFilter?: { name: string; phone: string; status: string };
+  onFilter: (filter: { name: string; phone: string; room: string }) => void;
+  initialFilter?: { name: string; phone: string; room: string };
 };
-
-const statusOptions = [
-  { value: '', label: 'All' },
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' },
-];
 
 const TenantFilter: React.FC<TenantFilterProps> = ({
   open,
   onClose,
   onFilter,
-  initialFilter = { name: '', phone: '', status: '' },
+  initialFilter = { name: '', phone: '', room: '' },
 }) => {
   const [filter, setFilter] = React.useState(initialFilter);
 
@@ -49,13 +43,7 @@ const TenantFilter: React.FC<TenantFilterProps> = ({
               <TextField label="Phone" name="phone" value={filter.phone} onChange={handleChange} fullWidth />
             </Grid>
             <Grid size={12}>
-              <TextField select label="Status" name="status" value={filter.status} onChange={handleChange} fullWidth>
-                {statusOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <TextField label="Room" name="room" value={filter.room} onChange={handleChange} fullWidth />
             </Grid>
           </Grid>
         </DialogContent>

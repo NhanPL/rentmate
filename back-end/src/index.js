@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const authRoutes = require("./routes/authRoute"); // Import auth routes
-const roomRoutes = require("./routes/roomRoute"); // Import auth routes
+const authRoutes = require("./routes/authRoute");
+const roomRoutes = require("./routes/roomRoute");
 const apartmentRoutes = require("./routes/apartmentRoute");
 const tenantRoutes = require("./routes/tenantRoute");
 const contractRoutes = require("./routes/contractRoute");

@@ -7,6 +7,9 @@ import { Apartment } from '../../../types';
 import UploadFileButton from '../../uploadFileButton/UploadFileButton';
 import { addApartment, updateApartment } from '../../../api/apartment';
 import { uploadFile } from '../../../api/upload';
+import { omit } from '../../../utils/format';
+import { setLoading } from '../../../stores/slices/loadingSlice';
+import { useDispatch } from 'react-redux';
 
 const apartmentSchema = z.object({
   id: z.string().optional(),
@@ -21,11 +24,13 @@ export type ApartmentFormData = z.infer<typeof apartmentSchema>;
 interface ApartmentFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  initialData?: Apartment;
+  initialData?: Apartment | null;
 }
 
 const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, initialData }) => {
   const [file, setFile] = React.useState<File | null>(null);
+  const [isChangeImage, setIsChangeImage] = React.useState(false);
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -33,7 +38,7 @@ const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, i
     reset: formReset,
   } = useForm<ApartmentFormData>({
     resolver: zodResolver(apartmentSchema),
-    defaultValues: initialData || {
+    defaultValues: {
       name: '',
       address: '',
       fileUrl: '',
@@ -41,10 +46,24 @@ const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, i
     },
   });
 
+  const changeImage = (file: File | null) => {
+    setFile(file);
+    setIsChangeImage(true);
+  };
+
   const onSubmit = async (data: ApartmentFormData) => {
     try {
+      dispatch(setLoading(true));
       if (initialData) {
-        // Update existing apartment
+        console.log(initialData);
+        if (isChangeImage) {
+          if (file) {
+            const { url: fileUrl, public_id: fileId } = await uploadFile(file);
+            data = { ...data, fileUrl, fileId };
+          }
+        } else {
+          data = { ...data, fileUrl: initialData.fileUrl, fileId: initialData.fileId };
+        }
         await updateApartment(initialData.id, data);
       } else {
         if (file) {
@@ -54,7 +73,8 @@ const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, i
         // Add new apartment
         await addApartment(data);
       }
-      onClose(); // Close the dialog after submission
+      dispatch(setLoading(false));
+      onClose();
     } catch (error) {
       console.error('Error submitting form:', error);
     }
@@ -62,14 +82,18 @@ const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, i
 
   React.useEffect(() => {
     if (initialData) {
-      formReset(initialData);
+      const rest = omit(initialData, ['id']);
+      formReset(rest);
     } else {
       formReset({
         name: '',
         address: '',
+        fileUrl: '',
+        fileId: '',
       });
     }
   }, [initialData, formReset, isOpen]);
+
   return (
     <Dialog
       open={isOpen}
@@ -130,7 +154,7 @@ const FormApartments: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, i
             <Typography variant="subtitle1" sx={{ marginBottom: 2 }}>
               Images:
             </Typography>
-            <UploadFileButton accept=".jpg,.png,.pdf" onFileChange={(file) => setFile(file)} previewImg />
+            <UploadFileButton accept=".jpg,.png,.pdf" onFileChange={changeImage} previewImg />
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2, gap: 2 }}>
             <Button variant="contained" color="secondary" type="reset" onClick={onClose}>
