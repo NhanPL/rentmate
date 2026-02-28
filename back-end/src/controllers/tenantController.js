@@ -1,4 +1,4 @@
-const Tenant = require("../models/TenantModel");
+const Tenant = require("../models/tenantModel");
 
 exports.getAll = async (req, res) => {
   try {

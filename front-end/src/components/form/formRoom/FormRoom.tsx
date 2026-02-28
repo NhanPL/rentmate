@@ -23,7 +23,7 @@ const apartmentSchema = z.object({
   type: z.string().min(1, 'Type is required'),
   price: z.coerce.number().min(0, 'Rent amount cannot be negative'),
   size: z.string().min(1, 'Size is required'),
-  status: z.enum(['availabled', 'occupied', 'maintenance']),
+  status: z.enum(['available', 'occupied', 'maintenance']),
 });
 
 type ApartmentFormData = z.infer<typeof apartmentSchema>;
@@ -49,7 +49,7 @@ const FormRoom: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, initial
       type: initialData ? initialData.type : '',
       price: initialData ? initialData.price : 0,
       size: initialData ? initialData.size : '',
-      status: initialData ? initialData.status : 'availabled',
+      status: initialData ? (initialData.status === 'availabled' ? 'available' : initialData.status) : 'available',
     },
   });
 
@@ -80,13 +80,17 @@ const FormRoom: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, initial
 
   React.useEffect(() => {
     if (initialData) {
-      formReset(initialData);
+      formReset({
+        ...initialData,
+        status: initialData.status === 'availabled' ? 'available' : initialData.status,
+      });
     } else {
       formReset({
         name: '',
         type: '',
         price: 0,
-        status: 'availabled',
+        size: '',
+        status: 'available',
       });
     }
   }, [initialData, formReset, isOpen]);
@@ -182,9 +186,9 @@ const FormRoom: React.FC<ApartmentFormDialogProps> = ({ isOpen, onClose, initial
                     {...field}
                     value={field.value || ''}
                   >
-                    <MenuItem value={'availabled'}>Availabled</MenuItem>
+                    <MenuItem value={'available'}>Available</MenuItem>
                     <MenuItem value={'occupied'}>Occupied</MenuItem>
-                    <MenuItem value={'maintaince'}>Maintaince</MenuItem>
+                    <MenuItem value={'maintenance'}>Maintenance</MenuItem>
                   </Select>
                 )}
               />

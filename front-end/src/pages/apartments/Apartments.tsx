@@ -7,7 +7,7 @@ import FormApartments from '../../components/form/formApartments/FormApartments'
 
 const Apartments: React.FC = () => {
   const [openForm, setOpenForm] = React.useState(false);
-  const [apartments, setApartments] = useState<Array<{ id: string; name: string; address: string; fileurl: string }>>(
+  const [apartments, setApartments] = useState<Array<{ id: string; name: string; address: string; fileUrl?: string }>>(
     []
   );
   const [loading, setLoading] = useState(true);
@@ -65,7 +65,7 @@ const Apartments: React.FC = () => {
               apartmentId={property.id}
               name={property.name}
               location={property.address}
-              imageUrl={property.fileurl}
+              imageUrl={property.fileUrl}
             />
           ))
         )}

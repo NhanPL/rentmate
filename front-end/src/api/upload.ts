@@ -25,7 +25,7 @@ export const updateFile = async (id: string, file: File) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await API.put(`/api/upload/${id}`, formData, {
+    const response = await API.put(`/upload/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -40,7 +40,7 @@ export const updateFile = async (id: string, file: File) => {
 // Delete a file
 export const deleteFile = async (id: string) => {
   try {
-    const response = await API.delete(`/api/upload/${id}`);
+    const response = await API.delete(`/upload/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error deleting file:', error);

@@ -5,5 +5,5 @@ export interface Room {
   type: string;
   price: number;
   size: string;
-  status: 'availabled' | 'occupied' | 'maintenance';
+  status: 'available' | 'availabled' | 'occupied' | 'maintenance';
 }

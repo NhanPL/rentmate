@@ -9,7 +9,7 @@ const SideBar = () => {
     setSelectedIndex(() => {
       if (location.pathname.includes('/dashboard')) {
         return 0;
-      } else if (location.pathname.includes('/Apartments')) {
+      } else if (location.pathname.includes('/apartments')) {
         return 1;
       } else if (location.pathname.includes('/tenants')) {
         return 2;
@@ -33,7 +33,7 @@ const SideBar = () => {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="/Apartments" selected={selectedIndex === 1}>
+            <ListItemButton component={Link} to="/apartments" selected={selectedIndex === 1}>
               <ListItemText primary="Apartments" />
             </ListItemButton>
           </ListItem>

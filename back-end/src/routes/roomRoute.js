@@ -6,7 +6,7 @@ const authMiddleware = require("../middlewares/authMiddleware");
 router.get(
   "/apartment/:id",
   authMiddleware,
-  roomController.getRoomByAparmentId
+  roomController.getRoomByApartmentId
 );
 router.get("/:id", authMiddleware, roomController.getRoomById);
 router.post("/", authMiddleware, roomController.createRoom);

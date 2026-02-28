@@ -12,7 +12,7 @@ import TableCommon from '../../components/tableCommon/TableCommon';
 import { formatNumberIntl } from '../../utils/format';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Room } from '../../types/Room';
-import { getRoomsByAparmentId } from '../../api/room';
+import { getRoomsByApartmentId } from '../../api/room';
 import { getApartmentByID } from '../../api/apartment';
 import { Apartment } from '../../types';
 
@@ -47,7 +47,7 @@ const ApartmentsDetail = () => {
 
   const closeFormRoom = async (isFetching: boolean = false) => {
     if (isFetching) {
-      const data = await getRoomsByAparmentId(apartmentId);
+      const data = await getRoomsByApartmentId(apartmentId);
       setRooms(data);
     }
     setIsOpenFormRoom(!isOpenFormRoom);
@@ -77,7 +77,7 @@ const ApartmentsDetail = () => {
   ];
 
   const changeViewDetailRoom = () => {
-    navigate(`/apartments/1/rooms/${selectedRowId}`);
+    navigate(`/apartments/${apartmentId}/rooms/${selectedRowId}`);
   };
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, id: string) => {
@@ -97,12 +97,12 @@ const ApartmentsDetail = () => {
       size: item.size,
       price: formatNumberIntl(item.price),
       status:
-        item.status == 'availabled' ? (
-          <Chip label="Availabled" color="success" />
+        item.status === 'available' || item.status === 'availabled' ? (
+          <Chip label="Available" color="success" />
         ) : item.status == 'occupied' ? (
           <Chip label="Occupied" color="error" />
         ) : (
-          <Chip label="Maintaince" color="warning" />
+          <Chip label="Maintenance" color="warning" />
         ),
       actions: (
         <div key={index}>
@@ -117,7 +117,7 @@ const ApartmentsDetail = () => {
   useEffect(() => {
     document.title = 'Apartment Detail';
     const fetchRooms = async () => {
-      const data = await getRoomsByAparmentId(apartmentId);
+      const data = await getRoomsByApartmentId(apartmentId);
       setRooms(data);
     };
 
@@ -151,7 +151,7 @@ const ApartmentsDetail = () => {
       ></PositionedMenu>
 
       <Box component={'div'} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, marginBottom: 2 }}>
-        <Link to={`/Apartments`}>
+        <Link to={`/apartments`}>
           <Button variant="outlined">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Apartment
