@@ -15,6 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { getInfoRentalTenantById } from '../../../api/tenant';
 import { getAllApartments } from '../../../api/apartment';
+import { getRoomsByAparmentId } from '../../../api/room';
 
 interface RentalFormProps {
   open: boolean;
@@ -109,8 +110,8 @@ export const RentalForm: React.FC<RentalFormProps> = ({ open, onClose, tenantId 
   const handleBuildingChange = async (buildingId: string) => {
     try {
       setLoading(true);
-      // const data = await rentalService.getRoomsByBuilding(buildingId);
-      // setRooms(data);
+      const data = await getRoomsByAparmentId(buildingId);
+      setRooms(data);
       setValue('room', '');
       setSelectedRoom(null);
       setError(null);
