@@ -2,7 +2,7 @@ import { Room } from '../types/Room';
 import API from './AxiosInterceptor';
 
 // get all Room by Apartment ID
-export const getRoomsByAparmentId = async (id: string) => {
+export const getRoomsByApartmentId = async (id: string) => {
   try {
     const response = await API.get('/room/apartment/' + id);
     return response.data;
@@ -54,3 +54,7 @@ export const deleteRoom = async (id: string) => {
     throw error;
   }
 };
+
+
+// Backward-compatible alias (typo)
+export const getRoomsByAparmentId = getRoomsByApartmentId;

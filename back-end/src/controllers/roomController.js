@@ -1,6 +1,6 @@
 const RoomModel = require("../models/RoomModel");
 
-const getRoomByAparmentId = async (req, res) => {
+const getRoomByApartmentId = async (req, res) => {
   try {
     const rooms = await RoomModel.getAllRoomByApartmentId(req.params.id);
     res.json(rooms);
@@ -41,7 +41,7 @@ const updateRoom = async (req, res) => {
 
 const deleteRoom = async (req, res) => {
   try {
-    await RoomModel.remove(req.params.id);
+    await RoomModel.delete(req.params.id);
     res.json({ message: "Room deleted" });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -49,7 +49,7 @@ const deleteRoom = async (req, res) => {
 };
 
 module.exports = {
-  getRoomByAparmentId,
+  getRoomByApartmentId,
   getRoomById,
   createRoom,
   updateRoom,

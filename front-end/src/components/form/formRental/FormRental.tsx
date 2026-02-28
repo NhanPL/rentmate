@@ -106,11 +106,12 @@ export const RentalForm: React.FC<RentalFormProps> = ({ open, onClose, tenantId 
     }
   }, [watchRoom, rooms]);
 
-  const handleBuildingChange = async (buildingId: string) => {
+  const handleBuildingChange = async (_buildingId: string) => {
     try {
       setLoading(true);
       // const data = await rentalService.getRoomsByBuilding(buildingId);
       // setRooms(data);
+      setRooms([]);
       setValue('room', '');
       setSelectedRoom(null);
       setError(null);
