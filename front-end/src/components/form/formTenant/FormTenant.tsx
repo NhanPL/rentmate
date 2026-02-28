@@ -10,6 +10,7 @@ import {
   Modal,
   Row,
   Select,
+  Spin,
   Space,
   Tabs,
   Upload,
@@ -18,9 +19,12 @@ import {
 import type { FormListFieldData, FormListOperation } from 'antd/es/form/FormList';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import dayjs, { Dayjs } from 'dayjs';
-import { addTenant, updateTenant } from '../../../api/tenant';
+import axios from 'axios';
+import { addTenant, getTenantByID, updateTenant } from '../../../api/tenant';
+import { mapTenantDtoToFormValues } from '../../../pages/tenants/mapper';
+import type { TenantMode } from '../../../pages/tenants/types';
 
-type Mode = 'CREATE' | 'UPDATE';
+type Mode = TenantMode;
 
 type Gender = 'MALE' | 'FEMALE' | 'OTHER';
 type TenantStatus = 'ACTIVE' | 'MOVED_OUT' | 'BLACKLIST';
@@ -107,10 +111,12 @@ interface LegacyInitialData {
 interface TenantFormDrawerProps {
   open: boolean;
   mode?: Mode;
+  editingId?: string | null;
   loading?: boolean;
   initialValues?: TenantFormInitialValues;
   initialData?: LegacyInitialData;
   onSubmit?: (payload: TenantFormPayload) => Promise<void> | void;
+  onSuccess?: () => Promise<void> | void;
   onCancel?: () => void;
   onClose?: () => void;
 }
@@ -313,15 +319,18 @@ const uploadNormalizer: UploadProps['getValueFromEvent'] = (event: { fileList?: 
 const TenantFormDrawer: React.FC<TenantFormDrawerProps> = ({
   open,
   mode,
+  editingId,
   loading = false,
   initialValues,
   initialData,
   onSubmit,
+  onSuccess,
   onCancel,
   onClose,
 }) => {
   const [form] = Form.useForm<TenantFormValues>();
   const [activeTab, setActiveTab] = useState('personal');
+  const [isFetchingTenant, setIsFetchingTenant] = useState(false);
 
   const resolvedMode: Mode = mode || (initialValues || initialData ? 'UPDATE' : 'CREATE');
   const resolvedInitialValues = useMemo(
@@ -334,11 +343,65 @@ const TenantFormDrawer: React.FC<TenantFormDrawerProps> = ({
   );
 
   useEffect(() => {
-    if (open) {
-      form.setFieldsValue(mappedInitialValues);
-      setActiveTab('personal');
+    if (!open) {
+      form.resetFields();
+      return;
     }
-  }, [form, mappedInitialValues, open]);
+
+    setActiveTab('personal');
+
+    if (resolvedMode === 'CREATE') {
+      form.resetFields();
+      form.setFieldsValue({ ...mappedInitialValues, status: 'ACTIVE' });
+      return;
+    }
+
+    if (!editingId) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const fetchTenant = async () => {
+      setIsFetchingTenant(true);
+      try {
+        const tenant = await getTenantByID(editingId, controller.signal);
+        if (!tenant) {
+          message.error('Không tìm thấy dữ liệu người thuê.');
+          onClose?.();
+          return;
+        }
+
+        const mapped = mapTenantDtoToFormValues(tenant);
+        form.resetFields();
+        form.setFieldsValue({
+          ...mappedInitialValues,
+          ...mapped,
+          status: mappedInitialValues.status || 'ACTIVE',
+        });
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          return;
+        }
+
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          message.error('Tenant không tồn tại hoặc đã bị xóa.');
+          onClose?.();
+          return;
+        }
+
+        message.error('Không thể tải thông tin tenant để cập nhật.');
+      } finally {
+        setIsFetchingTenant(false);
+      }
+    };
+
+    fetchTenant();
+
+    return () => {
+      controller.abort();
+    };
+  }, [editingId, form, mappedInitialValues, onClose, open, resolvedMode]);
 
   const closeHandler = onCancel || onClose || (() => undefined);
 
@@ -359,7 +422,6 @@ const TenantFormDrawer: React.FC<TenantFormDrawerProps> = ({
 
   const handleLegacySubmit = async (payload: TenantFormPayload) => {
     const legacyTenant = {
-      id: payload.tenant.id || '',
       name: payload.tenant.fullName,
       email: payload.tenant.email || '',
       phone: payload.tenant.phone,
@@ -369,13 +431,15 @@ const TenantFormDrawer: React.FC<TenantFormDrawerProps> = ({
       birthday: payload.tenant.dob || '',
     };
 
-    if (resolvedMode === 'UPDATE' && payload.tenant.id) {
-      await updateTenant(payload.tenant.id, legacyTenant);
+    if (resolvedMode === 'UPDATE' && editingId) {
+      await updateTenant(editingId, legacyTenant);
       message.success('Cập nhật người thuê thành công');
     } else {
       await addTenant(legacyTenant);
       message.success('Thêm người thuê thành công');
     }
+
+    await onSuccess?.();
   };
 
   const handleFinish = async (values: TenantFormValues) => {
@@ -399,13 +463,14 @@ const TenantFormDrawer: React.FC<TenantFormDrawerProps> = ({
       extra={
         <Space>
           <Button onClick={handleClose}>{i18n.vi.actions.cancel}</Button>
-          <Button type="primary" loading={loading} onClick={() => form.submit()}>
+          <Button type="primary" loading={loading || isFetchingTenant} onClick={() => form.submit()} disabled={isFetchingTenant}>
             {i18n.vi.actions.save}
           </Button>
         </Space>
       }
     >
-      <Form<TenantFormValues> form={form} layout="vertical" onFinish={handleFinish} requiredMark="optional">
+      <Spin spinning={isFetchingTenant}>
+        <Form<TenantFormValues> form={form} layout="vertical" onFinish={handleFinish} requiredMark="optional">
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
@@ -652,7 +717,8 @@ const TenantFormDrawer: React.FC<TenantFormDrawerProps> = ({
             },
           ]}
         />
-      </Form>
+        </Form>
+      </Spin>
     </Drawer>
   );
 };
