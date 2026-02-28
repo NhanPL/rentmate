@@ -1,7 +1,8 @@
 import { Delete, Edit, Home, MoreVert, Visibility } from '@mui/icons-material';
 import { Box, Button, Card, Typography } from '@mui/material';
+import { message } from 'antd';
 import { PlusCircle } from 'lucide-react';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { getAllTenants } from '../../api/tenant';
 import { RentalForm } from '../../components/form/formRental/FormRental';
 import FormTenant from '../../components/form/formTenant/FormTenant';
@@ -9,15 +10,16 @@ import PositionedMenu, { SharedMenuItem } from '../../components/positionedMenu/
 import TableCommon from '../../components/tableCommon/TableCommon';
 import { formatDate } from '../../utils/format';
 import TenantFilter from './TenantFilter';
-import { Tenant } from '../../types';
+import type { TenantDTO, TenantMode } from './types';
 
 const Tenants: React.FC = () => {
   const [openForm, setOpenForm] = React.useState(false);
   const [openFormRental, setOpenFormRental] = React.useState(false);
   const [openFilter, setOpenFilter] = React.useState(false);
   const [filterKeyword, setFilterKeyword] = React.useState({ name: '', phone: '', room: '' });
-  const [tenants, setTenants] = React.useState<Tenant[]>([]);
-  const [editTenant, setEditTenant] = React.useState<Tenant | null>(null);
+  const [tenants, setTenants] = React.useState<TenantDTO[]>([]);
+  const [mode, setMode] = React.useState<TenantMode>('CREATE');
+  const [editingId, setEditingId] = React.useState<string | null>(null);
   const [selectedRowId, setSelectedRowId] = React.useState<string>('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -25,6 +27,15 @@ const Tenants: React.FC = () => {
   const filteredTenants = (data: { name: string; phone: string; room: string }) => {
     setFilterKeyword(data);
   };
+
+  const fetchTenants = useCallback(async () => {
+    try {
+      const tenantData = await getAllTenants();
+      setTenants(tenantData);
+    } catch {
+      message.error('Không thể tải danh sách người thuê');
+    }
+  }, []);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, id: string) => {
     setAnchorEl(event.currentTarget);
@@ -44,6 +55,17 @@ const Tenants: React.FC = () => {
 
   const headName = ['Name', 'Card ID', 'Gender', 'Birthday', 'Phone', 'Room', 'Apartment', 'Actions'];
 
+  const handleEditTenant = (id: string) => {
+    if (!id) {
+      message.error('Không tìm thấy tenant id để chỉnh sửa');
+      return;
+    }
+
+    setMode('UPDATE');
+    setEditingId(id);
+    setOpenForm(true);
+  };
+
   const menuItems: SharedMenuItem[] = [
     {
       label: 'Xem chi tiết',
@@ -55,7 +77,7 @@ const Tenants: React.FC = () => {
       label: 'Chỉnh sửa',
       color: 'info',
       icon: <Edit fontSize="small" />,
-      onClick: () => {},
+      onClick: handleEditTenant,
     },
     {
       label: 'Thuê phòng',
@@ -77,10 +99,10 @@ const Tenants: React.FC = () => {
     name: tenant.name,
     cardId: tenant.cardId,
     gender: tenant.gender,
-    birthday: formatDate(tenant.birthday),
+    birthday: formatDate(tenant.birthday || ''),
     phone: tenant.phone,
-    room: '---',
-    apartment: '---',
+    room: tenant.roomName || '---',
+    apartment: tenant.apartmentName || '---',
     actions: (
       <div key={idx}>
         <Button variant="text" color="primary" onClick={(e) => handleOpenMenu(e, tenant.id)} aria-label="more">
@@ -91,12 +113,8 @@ const Tenants: React.FC = () => {
   }));
 
   useEffect(() => {
-    const fetchTenants = async () => {
-      const tenantData = await getAllTenants();
-      setTenants(tenantData);
-    };
     fetchTenants();
-  }, []);
+  }, [fetchTenants]);
 
   return (
     <Box className="flex flex-col gap-6 p-4">
@@ -112,7 +130,8 @@ const Tenants: React.FC = () => {
             variant="outlined"
             startIcon={<PlusCircle size={20} />}
             onClick={() => {
-              setEditTenant(null);
+              setMode('CREATE');
+              setEditingId(null);
               setOpenForm(true);
             }}
           >
@@ -125,11 +144,14 @@ const Tenants: React.FC = () => {
       </Card>
       <FormTenant
         open={openForm}
+        mode={mode}
+        editingId={editingId}
+        onSuccess={fetchTenants}
         onClose={() => {
           setOpenForm(false);
-          setEditTenant(null);
+          setEditingId(null);
+          setMode('CREATE');
         }}
-        initialData={editTenant || undefined}
       />
       <RentalForm open={openFormRental} onClose={handleToggleFormRental} tenantId={selectedRowId}></RentalForm>
       <TenantFilter
@@ -152,7 +174,7 @@ const Tenants: React.FC = () => {
           horizontal: 'left',
         }}
         items={menuItems}
-        id={''}
+        id={selectedRowId}
       ></PositionedMenu>
     </Box>
   );
