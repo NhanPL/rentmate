@@ -28,8 +28,12 @@ const ApartmentsDetail = () => {
 
   const navigate = useNavigate();
 
-  const handleToggleFormApartments = () => {
+  const handleToggleFormApartments = async () => {
     setOpenFormApartments(!openFormApartments);
+    if (openFormApartments) {
+      const data = await getApartmentByID(apartmentId);
+      setApartment(data);
+    }
   };
 
   const openFormRoom = () => {
@@ -47,6 +51,8 @@ const ApartmentsDetail = () => {
       setRooms(data);
     }
     setIsOpenFormRoom(!isOpenFormRoom);
+    setSelectedRowId('');
+    setRoom(null);
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -119,13 +125,13 @@ const ApartmentsDetail = () => {
       const data = await getApartmentByID(apartmentId);
       setApartment(data);
     };
-    fetchRooms();
     fetchApartmentById();
+    fetchRooms();
   }, [apartmentId]);
 
   return (
     <Box component="div" sx={{ padding: 2, backgroundColor: '#FAFBFD' }}>
-      <FormApartments isOpen={openFormApartments} onClose={handleToggleFormApartments} />
+      <FormApartments isOpen={openFormApartments} initialData={apartment} onClose={handleToggleFormApartments} />
       <FormRoom isOpen={isOpenFormRoom} initialData={room} onClose={closeFormRoom} apartmentId={apartmentId} />
       <PositionedMenu
         anchorEl={anchorEl}

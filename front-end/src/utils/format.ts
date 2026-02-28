@@ -10,10 +10,19 @@ export function formatNumberIntl(num: number): string {
 }
 
 export function formatDate(date: Date | string): string {
-  return moment(date).format('DD/MM/YYYY');
+  return moment(new Date(date)).format('YYYY-MM-DD');
 }
 
 export function getDisplayName(fullName: string): string {
   const parts = fullName.trim().split(/\s+/);
-  return parts[parts.length - 1]; // Tên cuối
+  return parts[parts.length - 1];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function omit<T extends Record<string, any>, K extends keyof T>(obj: T, keys: readonly K[]): Omit<T, K> {
+  const clone = { ...obj };
+  for (const key of keys) {
+    delete clone[key];
+  }
+  return clone;
 }

@@ -18,3 +18,14 @@ export interface AuthState {
   accessToken: string;
   refreshToken: string;
 }
+
+export type Tenant = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  gender: string;
+  cardId: string;
+  location: string;
+  birthday: string;
+};

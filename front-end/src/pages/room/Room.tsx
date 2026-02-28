@@ -370,7 +370,7 @@ const Room = () => {
         </Card>
       </main>
 
-      <FormRoom isOpen={openFormRoom} onClose={handleToggleFormRoom} />
+      <FormRoom isOpen={openFormRoom} onClose={handleToggleFormRoom} apartmentId={'1'} />
       <FormPayment open={openFormPayment} onClose={handleToggleFormPayment} />
       <FormTenant open={openFormTenant} onClose={handleToggleFormTenant} />
     </div>

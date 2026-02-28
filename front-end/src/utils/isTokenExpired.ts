@@ -11,7 +11,6 @@ export const isTokenExpired = (token: string): boolean => {
     const decoded = jwtDecode<JwtPayload>(token);
     if (!decoded.exp) return true;
     const now = Date.now() / 1000; // giây
-    console.log(decoded.exp, now);
     return decoded.exp < now;
   } catch {
     return true; // token hỏng coi như hết hạn

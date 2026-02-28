@@ -31,7 +31,7 @@ type ApartmentFormData = z.infer<typeof apartmentSchema>;
 interface ApartmentFormDialogProps {
   isOpen: boolean;
   onClose: (isRetching: boolean) => void;
-  initialData: Room | null;
+  initialData?: Room | null;
   apartmentId: string;
 }
 
